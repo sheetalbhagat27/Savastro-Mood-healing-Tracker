@@ -1,6 +1,6 @@
 /**
- * Base responsive email template matching the Savastro brand identity.
- * Palette: Deep Navy (#0f131d), Card (#181c26), Purple Accents (#7c4dff, #d0bcff), Text (#e6e8f4).
+ * Base responsive email template matching the Sovastro brand identity.
+ * Palette: Cosmic Dark (#0a0a0f), Card (#12121a), Flame Orange Accents (#f95701, #ff7a1a).
  */
 export const wrapEmailTemplate = ({ title, preheader = '', contentHtml }) => {
   return `<!DOCTYPE html>
@@ -13,48 +13,48 @@ export const wrapEmailTemplate = ({ title, preheader = '', contentHtml }) => {
     body {
       margin: 0;
       padding: 0;
-      background-color: #0f131d;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      color: #e6e8f4;
+      background-color: #0a0a0f;
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #f3f4f6;
       -webkit-font-smoothing: antialiased;
     }
     .wrapper {
       width: 100%;
       table-layout: fixed;
-      background-color: #0f131d;
+      background-color: #0a0a0f;
       padding: 40px 16px;
     }
     .container {
       max-width: 580px;
       margin: 0 auto;
-      background-color: #181c26;
-      border: 1px solid #2b303c;
-      border-radius: 18px;
+      background-color: #12121a;
+      border: 1px solid #1f2333;
+      border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
     }
     .header {
       padding: 32px 32px 24px;
       text-align: center;
-      border-bottom: 1px solid #2b303c;
-      background: linear-gradient(180deg, #1f2533 0%, #181c26 100%);
+      border-bottom: 1px solid #1f2333;
+      background: linear-gradient(180deg, #181824 0%, #12121a 100%);
     }
     .logo {
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 28px;
       font-weight: 700;
-      color: #d0bcff;
-      letter-spacing: -0.5px;
+      color: #ff7a1a;
+      letter-spacing: 0.3px;
       margin: 0;
     }
     .tagline {
       font-size: 13px;
-      color: #9aa0b6;
+      color: #94a3b8;
       margin-top: 6px;
     }
     .body {
       padding: 36px 32px;
-      color: #e6e8f4;
+      color: #f3f4f6;
       font-size: 15px;
       line-height: 1.65;
     }
@@ -67,7 +67,7 @@ export const wrapEmailTemplate = ({ title, preheader = '', contentHtml }) => {
     }
     p {
       margin: 0 0 16px;
-      color: #c9ccd8;
+      color: #cbd5e1;
     }
     .btn-container {
       text-align: center;
@@ -75,38 +75,38 @@ export const wrapEmailTemplate = ({ title, preheader = '', contentHtml }) => {
     }
     .btn {
       display: inline-block;
-      background: linear-gradient(135deg, #7c4dff 0%, #d0bcff 100%);
-      color: #0f131d !important;
+      background: linear-gradient(90deg, #ff7a1a 0%, #f95701 100%);
+      color: #ffffff !important;
       font-weight: 700;
       font-size: 15px;
       text-decoration: none;
       padding: 14px 34px;
       border-radius: 12px;
       letter-spacing: 0.2px;
-      box-shadow: 0 4px 14px rgba(124, 77, 255, 0.35);
+      box-shadow: 0 4px 18px rgba(249, 87, 1, 0.4);
     }
     .highlight-box {
-      background-color: #12161f;
-      border: 1px solid #2b303c;
+      background-color: #0e0e16;
+      border: 1px solid #1f2333;
       border-radius: 12px;
       padding: 16px 20px;
       margin: 20px 0;
       font-size: 14px;
-      color: #9aa0b6;
+      color: #94a3b8;
     }
     .highlight-box b {
-      color: #4cd7f6;
+      color: #ff7a1a;
     }
     .footer {
       padding: 24px 32px;
       text-align: center;
       font-size: 12px;
-      color: #6b7280;
-      border-top: 1px solid #2b303c;
-      background-color: #141720;
+      color: #64748b;
+      border-top: 1px solid #1f2333;
+      background-color: #0e0e16;
     }
     .footer a {
-      color: #9aa0b6;
+      color: #94a3b8;
       text-decoration: underline;
     }
     @media only screen and (max-width: 600px) {
@@ -123,17 +123,17 @@ export const wrapEmailTemplate = ({ title, preheader = '', contentHtml }) => {
   <div class="wrapper">
     <div class="container">
       <div class="header">
-        <h1 class="logo">Savastro</h1>
+        <h1 class="logo">&#10022; Sovastro</h1>
         <div class="tagline">Your mood, your healing journey.</div>
       </div>
       <div class="body">
         ${contentHtml}
       </div>
       <div class="footer">
-        <p style="margin: 0 0 6px; font-size: 12px; color: #6b7280;">
-          Savastro – Mood &amp; Healing Tracker &bull; Confidential &amp; Secure
+        <p style="margin: 0 0 6px; font-size: 12px; color: #64748b;">
+          Sovastro – Mood &amp; Healing Tracker &bull; Confidential &amp; Secure
         </p>
-        <p style="margin: 0; font-size: 11px; color: #525866;">
+        <p style="margin: 0; font-size: 11px; color: #475569;">
           This is an automated system email. Please do not reply directly. If you did not initiate this action, please secure your account.
         </p>
       </div>

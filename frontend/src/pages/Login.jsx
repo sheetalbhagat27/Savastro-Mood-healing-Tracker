@@ -143,7 +143,7 @@ export default function Login({ onLogin }) {
   return (
     <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 16 }}>
       <div className="card center" style={{ maxWidth: 380, width: '100%' }}>
-        <div className="logo" style={{ padding: 0 }}>Savastro</div>
+        <div className="logo" style={{ padding: 0, justifyContent: 'center' }}>Sovastro</div>
         <p className="sub">
           {mode === 'login' && 'Your mood, your healing journey.'}
           {mode === 'register' && 'Begin your mindful healing journey.'}
@@ -209,7 +209,7 @@ export default function Login({ onLogin }) {
         {error && (
           <p
             role="alert"
-            style={{ color: '#ef4444', fontSize: 13, margin: '8px 0 0', textAlign: 'center' }}
+            style={{ color: '#f87171', fontSize: 13, margin: '8px 0 0', textAlign: 'center' }}
           >
             {error}
           </p>
@@ -218,7 +218,7 @@ export default function Login({ onLogin }) {
         {success && (
           <p
             role="status"
-            style={{ color: '#4cd7f6', fontSize: 13, margin: '8px 0 0', textAlign: 'center' }}
+            style={{ color: '#34d399', fontSize: 13, margin: '8px 0 0', textAlign: 'center' }}
           >
             {success}
           </p>
@@ -244,14 +244,14 @@ export default function Login({ onLogin }) {
         </p>
 
         {/* Minimal, elegant mode toggle links matching card typography */}
-        <div style={{ marginTop: 14, fontSize: 13, color: '#9aa0b6', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ marginTop: 14, fontSize: 13, color: '#94a3b8', display: 'flex', flexDirection: 'column', gap: 6 }}>
           {mode === 'login' && (
             <>
               <div>
                 Don't have an account?{' '}
                 <button
                   type="button"
-                  style={{ background: 'none', border: 0, color: '#d0bcff', padding: 0, textDecoration: 'underline' }}
+                  style={{ background: 'none', border: 0, color: '#ff7a1a', padding: 0, textDecoration: 'underline' }}
                   onClick={() => {
                     setMode('register');
                     setError('');
@@ -264,7 +264,7 @@ export default function Login({ onLogin }) {
               <div>
                 <button
                   type="button"
-                  style={{ background: 'none', border: 0, color: '#9aa0b6', padding: 0 }}
+                  style={{ background: 'none', border: 0, color: '#94a3b8', padding: 0 }}
                   onClick={() => {
                     setMode('forgot');
                     setError('');
@@ -282,7 +282,7 @@ export default function Login({ onLogin }) {
               Already have an account?{' '}
               <button
                 type="button"
-                style={{ background: 'none', border: 0, color: '#d0bcff', padding: 0, textDecoration: 'underline' }}
+                style={{ background: 'none', border: 0, color: '#ff7a1a', padding: 0, textDecoration: 'underline' }}
                 onClick={() => {
                   setMode('login');
                   setError('');
@@ -298,7 +298,7 @@ export default function Login({ onLogin }) {
             <div>
               <button
                 type="button"
-                style={{ background: 'none', border: 0, color: '#d0bcff', padding: 0, textDecoration: 'underline' }}
+                style={{ background: 'none', border: 0, color: '#ff7a1a', padding: 0, textDecoration: 'underline' }}
                 onClick={() => {
                   setMode('login');
                   setError('');
