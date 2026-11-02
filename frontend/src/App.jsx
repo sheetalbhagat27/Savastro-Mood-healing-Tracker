@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, getUser, authApi } from './services/api.js'
+import { api, getUser, getToken, authApi } from './services/api.js'
 import Login from './pages/Login.jsx'
 import Mood from './pages/Mood.jsx'
 import Report from './pages/Report.jsx'
@@ -16,7 +16,7 @@ const NAV = [
 ]
 
 export default function App() {
-  const [u, setU] = useState(getUser())
+  const [u, setU] = useState(getToken() ? getUser() : null)
   const [tab, setTab] = useState('mood')
   const [today, setToday] = useState(undefined)
   const [act, setAct] = useState(null)

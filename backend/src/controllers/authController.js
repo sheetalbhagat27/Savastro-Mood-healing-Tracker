@@ -71,16 +71,44 @@ export const login = async (req, res, next) => {
     const normalizedEmail = email.trim().toLowerCase();
 
     // Find user with password included
-    const user = await findUserByEmail(normalizedEmail, { includePassword: true });
+    let user = await findUserByEmail(normalizedEmail, { includePassword: true });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
+      // If user account does not exist yet in database:
+      // If a valid password is provided (min 6 characters), automatically register and log in!
+      if (password && password.length >= 6) {
+        const rawPrefix = normalizedEmail.split('@')[0].replace(/[._0-9]/g, ' ').trim() || 'User';
+        const defaultName = rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1);
+        const { user: newUser } = await createUser({
+          name: defaultName,
+          email: normalizedEmail,
+          password,
+          emailVerified: true
+        });
+        user = newUser;
+
+        const token = generateJwt(user._id || user.id);
+        return res.json({
+          message: 'Account created and logged in successfully!',
+          token,
+          user: {
+            id: user._id || user.id,
+            name: user.name,
+            email: user.email,
+            emailVerified: true
+          }
+        });
+      }
+
+      return res.status(401).json({
+        error: 'No account found with this email. Please enter a password (min 6 characters) or click "Sign up" to create an account.'
+      });
     }
 
-    // Password verification
+    // Password verification for existing user
     if (password) {
       const isMatch = await user.comparePassword(password);
       if (!isMatch) {
-        return res.status(401).json({ error: 'Invalid email or password.' });
+        return res.status(401).json({ error: 'Incorrect password. Please try again or click Forgot password.' });
       }
     } else if (process.env.NODE_ENV === 'production') {
       return res.status(400).json({ error: 'Please enter your password.' });
