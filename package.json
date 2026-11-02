@@ -4,10 +4,13 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"node server/server.js\" \"vite\"",
-    "client": "vite",
-    "server": "node server/server.js",
-    "build": "vite build"
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"blue,magenta\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "test": "npm run test --prefix backend",
+    "test:backend": "npm run test --prefix backend",
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix frontend"
   },
   "dependencies": {
     "@fontsource/playfair-display": "^5.3.0",
