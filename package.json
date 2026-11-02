@@ -1,0 +1,31 @@
+{
+  "name": "sovastro-mood-healing",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"node server/server.js\" \"vite\"",
+    "client": "vite",
+    "server": "node server/server.js",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@fontsource/playfair-display": "^5.3.0",
+    "@fontsource/plus-jakarta-sans": "^5.3.0",
+    "express": "^4.19.2",
+    "material-symbols": "^0.48.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.9",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^8.2.2",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "vite": "^5.4.8"
+  }
+}
