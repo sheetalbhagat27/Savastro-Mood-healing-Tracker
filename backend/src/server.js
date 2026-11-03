@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import helmet from 'helmet';
 
 // Load environment variables
 dotenv.config();
@@ -16,15 +17,27 @@ import guideRoutes from './routes/guideRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { login } from './controllers/authController.js';
-import { authLimiter } from './middleware/rateLimiter.js';
+import { authLimiter, generalLimiter } from './middleware/rateLimiter.js';
 import { getReport, populateDemo } from './controllers/moodController.js';
 import { getNotification } from './controllers/activityController.js';
 import { requireAuth } from './middleware/auth.js';
+import { mongoSanitize } from './middleware/sanitize.js';
 
 const app = express();
 
+// Trust reverse proxy (Vercel, Render, Heroku) for accurate client IP in rate limiting & logs
+app.set('trust proxy', 1);
+
 // Disable x-powered-by header for security
 app.disable('x-powered-by');
+
+// Apply HTTP security headers
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // APIs return JSON; CSP configured on frontend CDN/Vercel
+    crossOriginEmbedderPolicy: false
+  })
+);
 
 // CORS configuration
 const allowedOrigins = [
@@ -42,19 +55,32 @@ app.use(
       if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-      // Allow Vercel preview deployments
+      // Allow Vercel preview & production deployments
       if (origin.endsWith('.vercel.app')) {
         return callback(null, true);
       }
-      return callback(null, true); // Permissive in dev, logged in headers
+      if (process.env.NODE_ENV !== 'production') {
+        return callback(null, true);
+      }
+      const corsErr = new Error('CORS blocked: Origin not allowed.');
+      corsErr.status = 403;
+      return callback(corsErr);
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-user', 'x-auth-token'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
     credentials: true
   })
 );
 
-app.use(express.json());
+// Enforce request payload size limit (50kb prevents memory exhaustion DoS)
+app.use(express.json({ limit: '50kb' }));
+app.use(express.urlencoded({ extended: false, limit: '50kb' }));
+
+// Sanitize request data against NoSQL injection
+app.use(mongoSanitize);
+
+// Apply general rate limiting across all API endpoints
+app.use('/api', generalLimiter);
 
 // Routes
 app.use('/api/health', healthRoutes);

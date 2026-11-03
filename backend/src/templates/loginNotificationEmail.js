@@ -1,10 +1,10 @@
-import { wrapEmailTemplate } from './baseEmailTemplate.js';
+import { wrapEmailTemplate, escapeHtml } from './baseEmailTemplate.js';
 
 export const createLoginNotificationEmail = ({ name, date, ip, userAgent, accountUrl }) => {
-  const safeName = name ? name.replace(/</g, '&lt;').replace(/>/g, '&gt;') : 'Friend';
-  const formattedDate = date ? new Date(date).toUTCString() : new Date().toUTCString();
-  const safeIp = ip || 'Unavailable';
-  const safeDevice = userAgent ? userAgent.slice(0, 120).replace(/</g, '&lt;').replace(/>/g, '&gt;') : 'Web Browser';
+  const safeName = escapeHtml(name || 'Friend');
+  const formattedDate = escapeHtml(date ? new Date(date).toUTCString() : new Date().toUTCString());
+  const safeIp = escapeHtml(ip || 'Unavailable');
+  const safeDevice = escapeHtml(userAgent ? String(userAgent).slice(0, 120) : 'Web Browser');
 
   const contentHtml = `
     <h1>New Sign-in to Your Account</h1>

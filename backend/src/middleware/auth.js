@@ -19,16 +19,6 @@ export const requireAuth = async (req, res, next) => {
     }
 
     if (!token) {
-      // Legacy header fallback: x-user email
-      const legacyEmail = req.headers['x-user'];
-      if (legacyEmail && typeof legacyEmail === 'string' && legacyEmail.includes('@')) {
-        const user = await findUserByEmail(legacyEmail.toLowerCase().trim());
-        if (user) {
-          req.user = user;
-          return next();
-        }
-      }
-
       return res.status(401).json({
         error: 'Authentication required. Please log in to continue.',
         code: 'AUTH_REQUIRED'

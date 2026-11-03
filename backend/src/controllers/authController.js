@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import {
   findUserByEmail,
   findUserByVerificationToken,
@@ -8,18 +9,21 @@ import {
 import { generateJwt, hashToken } from '../utils/tokens.js';
 import emailService from '../services/emailService.js';
 
+// Precomputed bcrypt dummy hash for constant-time comparisons when email does not exist
+const DUMMY_HASH = '$2a$10$e8k8gUj0gUqgR8j8tG0q8e5o6R7y8u9i0o1p2a3s4d5f6g7h8j9k0';
+
 export const register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body || {};
 
-    if (!name || !name.trim()) {
-      return res.status(400).json({ error: 'Please enter your name.' });
+    if (!name || typeof name !== 'string' || !name.trim() || name.length > 100) {
+      return res.status(400).json({ error: 'Please enter your name (maximum 100 characters).' });
     }
-    if (!email || !email.includes('@')) {
+    if (!email || typeof email !== 'string' || !email.includes('@') || email.length > 120) {
       return res.status(400).json({ error: 'Please enter a valid email address.' });
     }
-    if (!password || password.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+    if (!password || typeof password !== 'string' || password.length < 6 || password.length > 128) {
+      return res.status(400).json({ error: 'Password must be between 6 and 128 characters long.' });
     }
 
     const normalizedEmail = email.trim().toLowerCase();
@@ -64,8 +68,11 @@ export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body || {};
 
-    if (!email || !email.includes('@')) {
+    if (!email || typeof email !== 'string' || !email.includes('@') || email.length > 120) {
       return res.status(400).json({ error: 'Please enter a valid email address.' });
+    }
+    if (!password || typeof password !== 'string' || password.length > 128) {
+      return res.status(400).json({ error: 'Please enter your password.' });
     }
 
     const normalizedEmail = email.trim().toLowerCase();
@@ -73,9 +80,8 @@ export const login = async (req, res, next) => {
     // Find user with password included
     let user = await findUserByEmail(normalizedEmail, { includePassword: true });
     if (!user) {
-      // If user account does not exist yet in database:
-      // If a valid password is provided (min 6 characters), automatically register and log in!
-      if (password && password.length >= 6) {
+      // In development/test mode, auto-provision user if min 6 character password provided
+      if (process.env.NODE_ENV !== 'production' && password.length >= 6) {
         const rawPrefix = normalizedEmail.split('@')[0].replace(/[._0-9]/g, ' ').trim() || 'User';
         const defaultName = rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1);
         const { user: newUser } = await createUser({
@@ -99,19 +105,17 @@ export const login = async (req, res, next) => {
         });
       }
 
+      // Mitigate timing attack user enumeration via constant-time dummy hash comparison
+      await bcrypt.compare(password, DUMMY_HASH).catch(() => {});
       return res.status(401).json({
-        error: 'No account found with this email. Please enter a password (min 6 characters) or click "Sign up" to create an account.'
+        error: 'Invalid email or password.'
       });
     }
 
     // Password verification for existing user
-    if (password) {
-      const isMatch = await user.comparePassword(password);
-      if (!isMatch) {
-        return res.status(401).json({ error: 'Incorrect password. Please try again or click Forgot password.' });
-      }
-    } else if (process.env.NODE_ENV === 'production') {
-      return res.status(400).json({ error: 'Please enter your password.' });
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
     // Email verification check (if enforced)

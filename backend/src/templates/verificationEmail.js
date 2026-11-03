@@ -1,7 +1,7 @@
-import { wrapEmailTemplate } from './baseEmailTemplate.js';
+import { wrapEmailTemplate, escapeHtml } from './baseEmailTemplate.js';
 
 export const createVerificationEmail = ({ name, verificationUrl }) => {
-  const safeName = name ? name.replace(/</g, '&lt;').replace(/>/g, '&gt;') : 'Friend';
+  const safeName = escapeHtml(name || 'Friend');
 
   const contentHtml = `
     <h1>Verify Your Email Address</h1>

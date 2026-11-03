@@ -3,8 +3,14 @@
  * Sanitizes errors, formats responses consistently, and prevents stack trace leakage.
  */
 export const errorHandler = (err, req, res, next) => {
-  let statusCode = res.statusCode !== 200 ? res.statusCode : 500;
+  let statusCode = err.status || (res.statusCode !== 200 ? res.statusCode : 500);
   let message = err.message || 'Internal Server Error';
+
+  // Handle CORS rejection
+  if (err.message && err.message.includes('CORS')) {
+    statusCode = 403;
+    message = 'Access forbidden: Origin not permitted.';
+  }
 
   // Handle Mongoose validation errors
   if (err.name === 'ValidationError') {
@@ -32,9 +38,12 @@ export const errorHandler = (err, req, res, next) => {
     message = 'Malformed JSON request body.';
   }
 
-  // Avoid logging benign 4xx errors as fatal
+  // Sanitize 500 errors in production to prevent leaking internal stack/paths
   if (statusCode >= 500) {
     console.error(`[Server Error 500] ${req.method} ${req.originalUrl}:`, err);
+    if (process.env.NODE_ENV === 'production') {
+      message = 'An unexpected server error occurred. Please try again later.';
+    }
   }
 
   res.status(statusCode).json({

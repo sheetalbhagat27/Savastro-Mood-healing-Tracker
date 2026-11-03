@@ -84,7 +84,6 @@ export const api = async (endpoint, body, customHeaders = {}) => {
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...(currentUser?.email ? { 'x-user': currentUser.email } : {}),
     ...customHeaders
   };
 

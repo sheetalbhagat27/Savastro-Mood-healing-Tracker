@@ -1,7 +1,17 @@
 /**
- * Base responsive email template matching the Sovastro brand identity.
- * Palette: Cosmic Dark (#0a0a0f), Card (#12121a), Flame Orange Accents (#f95701, #ff7a1a).
+ * HTML Entity Encoder for safe interpolation in email templates.
+ * Prevents HTML/script injection via user-controlled strings (e.g. name, user agent, ip).
  */
+export const escapeHtml = (str) => {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
 export const wrapEmailTemplate = ({ title, preheader = '', contentHtml }) => {
   return `<!DOCTYPE html>
 <html lang="en">

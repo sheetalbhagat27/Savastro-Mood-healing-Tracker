@@ -1,7 +1,7 @@
-import { wrapEmailTemplate } from './baseEmailTemplate.js';
+import { wrapEmailTemplate, escapeHtml } from './baseEmailTemplate.js';
 
 export const createPasswordResetEmail = ({ name, resetUrl, expiresInMinutes = 60 }) => {
-  const safeName = name ? name.replace(/</g, '&lt;').replace(/>/g, '&gt;') : 'Friend';
+  const safeName = escapeHtml(name || 'Friend');
 
   const contentHtml = `
     <h1>Password Reset Request</h1>
