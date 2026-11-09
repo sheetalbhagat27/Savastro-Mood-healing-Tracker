@@ -1,0 +1,5 @@
+export const httpError = (status, message) => Object.assign(new Error(message), { status })
+export const wrap = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
+export const dayStr = (d = new Date()) => d.toLocaleDateString('en-CA', { timeZone: process.env.TZ_NAME || 'Asia/Kolkata' })
+export const isDate = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s)
+export const str = (v, max = 500) => (typeof v === 'string' ? v.trim().slice(0, max) : '')

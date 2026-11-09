@@ -1,83 +1,45 @@
 import { useEffect, useState } from 'react'
-import { api } from '../services/api.js'
-
-export default function Tasks({ onStart, refresh }) {
-  const [a, set] = useState([])
-  const [f, setF] = useState({ name: 'Om Namah Shivay', target: 5, seconds: 20 })
-  const [open, setOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
-
-  const load = () => {
-    api('activities')
-      .then(res => set(Array.isArray(res) ? res : []))
-      .catch(err => console.error('Failed to load tasks:', err))
+import { api } from '../api'
+import { useToast } from '../context/ToastContext'
+const PRESETS = ['Om Namah Shivay', 'Gayatri Mantra', 'Maha Mrityunjaya Mantra', 'Hanuman Chalisa', 'Custom…']
+export default function Tasks() {
+  const toast = useToast()
+  const [list, setList] = useState(null), [name, setName] = useState(PRESETS[0]), [custom, setCustom] = useState(''), [target, setTarget] = useState(11)
+  const load = () => api('/tasks').then(setList).catch(e => toast(e.message, 'err'))
+  useEffect(() => { load() }, [])
+  const add = async e => {
+    e.preventDefault()
+    try { await api('/tasks', { method: 'POST', body: { name: name === 'Custom…' ? custom : name, target } }); setCustom(''); load() } catch (x) { toast(x.message, 'err') }
   }
-
-  useEffect(() => {
-    load()
-  }, [refresh])
-
-  const assign = async () => {
-    setLoading(true)
-    try {
-      await api('activities', f)
-      setOpen(false)
-      load()
-    } catch (err) {
-      alert(err.message || 'Failed to assign task')
-    } finally {
-      setLoading(false)
-    }
+  const tap = async t => {
+    const count = Math.min(t.target, t.count + 1)
+    setList(l => l.map(x => x._id === t._id ? { ...x, count } : x))
+    try { await api(`/tasks/${t._id}/progress`, { method: 'PATCH', body: { count } } ) } catch (x) { toast(x.message, 'err'); load() }
   }
-
+  const done = async t => { try { await api(`/tasks/${t._id}/complete`, { method: 'POST' }); toast('Task completed. Well done!'); load() } catch (x) { toast(x.message, 'err') } }
+  const del = async t => { if (confirm('Delete this task?')) { await api(`/tasks/${t._id}`, { method: 'DELETE' }).catch(() => {}); load() } }
   return (
     <div>
-      <h1>Healing tasks</h1>
-      <p className="sub">Remedies from your astrologer.</p>
-      {!a.length && <div className="card center sub">No tasks yet.</div>}
-      {a.slice().reverse().map(x => (
-        <div className="card row" key={x._id || x.id}>
+      <h1>Tasks</h1><p className="sub">Count your japa or daily practice and mark it complete.</p>
+      <form className="card inline" onSubmit={add}>
+        <label>Practice<select value={name} onChange={e => setName(e.target.value)}>{PRESETS.map(p => <option key={p}>{p}</option>)}</select></label>
+        {name === 'Custom…' && <label>Name<input value={custom} onChange={e => setCustom(e.target.value)} required /></label>}
+        <label>Target count<input type="number" min="1" max="1008" value={target} onChange={e => setTarget(e.target.value)} /></label>
+        <button className="btn">Add task</button>
+      </form>
+      {!list ? <p className="sub">Loading…</p> : !list.length ? <p className="sub">No tasks yet. Add your first one above.</p> : list.map(t => (
+        <div className="card task" key={t._id}>
           <div style={{ flex: 1 }}>
-            <b>{x.name}</b> <span className={x.status === 'done' ? 'done' : 'pend'}>{x.status === 'done' ? '✓ Done' : '● Pending'}</span>
-            <div className="sub" style={{ margin: 0 }}>{x.by} · {x.count}/{x.target}</div>
+            <b>{t.name}</b>
+            <div className="bar"><i style={{ width: `${(t.count / t.target) * 100}%` }} /></div>
+            <small>{t.count} / {t.target}</small>
           </div>
-          {x.status === 'pending' && (
-            <button className="btn" style={{ padding: '10px 22px' }} onClick={() => onStart(x)}>
-              Start
-            </button>
-          )}
+          {t.status === 'done' ? <span className="chip ok">✓ Completed</span> : <>
+            <button className="btn" disabled={t.count >= t.target} onClick={() => tap(t)}>+1</button>
+            <button className="btn-o" disabled={t.count < t.target} onClick={() => done(t)}>Complete</button></>}
+          <button className="icon" aria-label="Delete task" onClick={() => del(t)}>🗑</button>
         </div>
       ))}
-      <button className="btn ghost" onClick={() => setOpen(!open)}>
-        {open ? 'Cancel' : '+ Assign task (astrologer)'}
-      </button>
-      {open && (
-        <div className="card" style={{ marginTop: 14 }}>
-          <input
-            value={f.name}
-            onChange={e => setF({ ...f, name: e.target.value })}
-            placeholder="Task name"
-          />
-          <div style={{ display: 'flex', gap: 10 }}>
-            <input
-              type="number"
-              value={f.target}
-              onChange={e => setF({ ...f, target: e.target.value })}
-              title="Times"
-            />
-            <input
-              type="number"
-              value={f.seconds}
-              onChange={e => setF({ ...f, seconds: e.target.value })}
-              title="Seconds"
-            />
-          </div>
-          <p className="sub" style={{ margin: '0 0 10px', fontSize: 12 }}>Times · Seconds</p>
-          <button className="btn" disabled={loading} onClick={assign}>
-            {loading ? 'Sending...' : 'Send to user'}
-          </button>
-        </div>
-      )}
     </div>
   )
 }
